@@ -1,0 +1,465 @@
+'use client';
+
+import React from "react"
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { graphData, nodeTypeConfig, type GraphNode } from '@/lib/graph-data';
+
+interface NodePosition {
+  x: number;
+  y: number;
+  node: GraphNode;
+  scale: number;
+  angle: number;
+  radius: number;
+}
+
+export function ConstellationGraph({ 
+  onNodeSelect,
+  selectedNodeId,
+  filter
+}: { 
+  onNodeSelect: (node: GraphNode | null) => void;
+  selectedNodeId: string | null;
+  filter: string;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const animationRef = useRef<number>(0);
+  const timeRef = useRef(0);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const lastMousePos = useRef({ x: 0, y: 0 });
+
+  // Filter nodes based on the filter string
+  const filteredNodes = useMemo(() => {
+    if (!filter || filter === 'all') return graphData.nodes;
+    return graphData.nodes.filter(node => {
+      if (filter === 'models') return node.type === 'model';
+      if (filter === 'agents') return node.type === 'agent';
+      if (filter === 'servers') return node.type === 'mcp-server' || node.type === 'mcp-client';
+      if (filter === 'tools') return node.type === 'tool' || node.type === 'resource';
+      return true;
+    });
+  }, [filter]);
+
+  // Calculate node positions in a radial constellation layout
+  const nodePositions = useMemo(() => {
+    const positions: NodePosition[] = [];
+    const centerX = dimensions.width / 2;
+    const centerY = dimensions.height / 2;
+    
+    // Group nodes by type
+    const nodesByType: Record<string, GraphNode[]> = {};
+    filteredNodes.forEach(node => {
+      if (!nodesByType[node.type]) nodesByType[node.type] = [];
+      nodesByType[node.type].push(node);
+    });
+
+    // Position root at center
+    const rootNode = filteredNodes.find(n => n.type === 'root');
+    if (rootNode) {
+      positions.push({
+        x: centerX,
+        y: centerY,
+        node: rootNode,
+        scale: 1.5,
+        angle: 0,
+        radius: 0,
+      });
+    }
+
+    // Position other nodes in orbital rings
+    const typeOrder = ['mcp-client', 'mcp-server', 'agent', 'model', 'library', 'service', 'resource', 'tool'];
+    let ringIndex = 0;
+    
+    typeOrder.forEach(type => {
+      const nodes = nodesByType[type];
+      if (!nodes?.length) return;
+      
+      ringIndex++;
+      const ringRadius = 80 + ringIndex * 90;
+      const angleStep = (2 * Math.PI) / Math.max(nodes.length, 6);
+      const startAngle = (ringIndex * Math.PI) / 7;
+
+      nodes.forEach((node, i) => {
+        const angle = startAngle + i * angleStep;
+        positions.push({
+          x: centerX + Math.cos(angle) * ringRadius,
+          y: centerY + Math.sin(angle) * ringRadius,
+          node,
+          scale: 1,
+          angle,
+          radius: ringRadius,
+        });
+      });
+    });
+
+    return positions;
+  }, [filteredNodes, dimensions]);
+
+  // Filter edges to only include nodes that are visible
+  const filteredEdges = useMemo(() => {
+    const visibleNodeIds = new Set(filteredNodes.map(n => n.id));
+    return graphData.edges.filter(
+      edge => visibleNodeIds.has(edge.from) && visibleNodeIds.has(edge.to)
+    );
+  }, [filteredNodes]);
+
+  // Handle resize
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight,
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  // Draw function
+  const draw = useCallback((time: number) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = dimensions.width * dpr;
+    canvas.height = dimensions.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Clear canvas with Snyk Evo dark background
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+    
+    // Add subtle gradient overlay (purple to orange ambient)
+    const ambientGradient = ctx.createRadialGradient(
+      dimensions.width * 0.2, dimensions.height * 0.3, 0,
+      dimensions.width * 0.5, dimensions.height * 0.5, dimensions.width * 0.8
+    );
+    ambientGradient.addColorStop(0, 'rgba(139, 92, 246, 0.03)');
+    ambientGradient.addColorStop(0.5, 'rgba(219, 39, 119, 0.02)');
+    ambientGradient.addColorStop(1, 'rgba(249, 115, 22, 0.01)');
+    ctx.fillStyle = ambientGradient;
+    ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+
+    // Apply zoom and pan
+    ctx.save();
+    ctx.translate(dimensions.width / 2, dimensions.height / 2);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-dimensions.width / 2 + pan.x, -dimensions.height / 2 + pan.y);
+
+    // Draw subtle grid with brand tint
+    ctx.strokeStyle = 'rgba(192, 132, 252, 0.015)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < dimensions.width; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, dimensions.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i < dimensions.height; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(dimensions.width, i);
+      ctx.stroke();
+    }
+
+    // Draw orbital rings with gradient colors
+    const centerX = dimensions.width / 2;
+    const centerY = dimensions.height / 2;
+    for (let i = 1; i <= 8; i++) {
+      const radius = 80 + i * 90;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      // Gradient from purple to orange based on ring index
+      const hue = 280 - (i * 20); // Purple (280) to orange (40)
+      ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${0.06 - i * 0.006})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Create position lookup
+    const positionLookup: Record<string, NodePosition> = {};
+    nodePositions.forEach(p => {
+      positionLookup[p.node.id] = p;
+    });
+
+    // Draw edges with animated glow
+    filteredEdges.forEach(edge => {
+      const fromPos = positionLookup[edge.from];
+      const toPos = positionLookup[edge.to];
+      if (!fromPos || !toPos) return;
+
+      const isHighlighted = 
+        hoveredNode === edge.from || 
+        hoveredNode === edge.to ||
+        selectedNodeId === edge.from ||
+        selectedNodeId === edge.to;
+
+      // Animated pulse effect
+      const pulsePhase = (time * 0.001 + fromPos.angle) % 1;
+      
+      // Create gradient for edge
+      const gradient = ctx.createLinearGradient(fromPos.x, fromPos.y, toPos.x, toPos.y);
+      const fromConfig = nodeTypeConfig[fromPos.node.type];
+      const toConfig = nodeTypeConfig[toPos.node.type];
+      
+      if (isHighlighted) {
+        gradient.addColorStop(0, fromConfig.color + 'cc');
+        gradient.addColorStop(pulsePhase, fromConfig.color + 'ff');
+        gradient.addColorStop(1, toConfig.color + 'cc');
+      } else {
+        gradient.addColorStop(0, fromConfig.color + '33');
+        gradient.addColorStop(1, toConfig.color + '33');
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(fromPos.x, fromPos.y);
+      
+      // Curved lines for more organic feel
+      const midX = (fromPos.x + toPos.x) / 2;
+      const midY = (fromPos.y + toPos.y) / 2;
+      const dx = toPos.x - fromPos.x;
+      const dy = toPos.y - fromPos.y;
+      const nx = -dy * 0.1;
+      const ny = dx * 0.1;
+      
+      ctx.quadraticCurveTo(midX + nx, midY + ny, toPos.x, toPos.y);
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = isHighlighted ? 2 : 1;
+      ctx.stroke();
+
+      // Draw animated particle on highlighted edges
+      if (isHighlighted) {
+        const t = pulsePhase;
+        const px = fromPos.x + (toPos.x - fromPos.x) * t;
+        const py = fromPos.y + (toPos.y - fromPos.y) * t;
+        
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fillStyle = fromConfig.color;
+        ctx.fill();
+      }
+    });
+
+    // Draw nodes
+    nodePositions.forEach(pos => {
+      const config = nodeTypeConfig[pos.node.type];
+      const isHovered = hoveredNode === pos.node.id;
+      const isSelected = selectedNodeId === pos.node.id;
+      const scale = pos.scale * (isHovered || isSelected ? 1.2 : 1);
+      const baseSize = pos.node.type === 'root' ? 28 : 20;
+      const size = baseSize * scale;
+
+      // Glow effect
+      if (isHovered || isSelected) {
+        const glow = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, size * 2);
+        glow.addColorStop(0, config.color + '40');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, size * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Outer ring with subtle animation
+      const breathe = 1 + Math.sin(time * 0.002 + pos.angle) * 0.05;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size * breathe, 0, Math.PI * 2);
+      ctx.strokeStyle = config.borderColor;
+      ctx.lineWidth = isHovered || isSelected ? 2 : 1;
+      ctx.stroke();
+
+      // Node background
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size - 4, 0, Math.PI * 2);
+      ctx.fillStyle = config.bgColor;
+      ctx.fill();
+
+      // Inner glow
+      const innerGlow = ctx.createRadialGradient(
+        pos.x - size * 0.2, 
+        pos.y - size * 0.2, 
+        0, 
+        pos.x, 
+        pos.y, 
+        size
+      );
+      innerGlow.addColorStop(0, config.color + '30');
+      innerGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = innerGlow;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size - 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Status indicator
+      const status = pos.node.metadata?.status;
+      if (status) {
+        const statusColor = 
+          status === 'active' ? '#34d399' : 
+          status === 'warning' ? '#fbbf24' : 
+          '#6b7280';
+        ctx.beginPath();
+        ctx.arc(pos.x + size * 0.6, pos.y - size * 0.6, 4, 0, Math.PI * 2);
+        ctx.fillStyle = statusColor;
+        ctx.fill();
+      }
+
+      // Icon/symbol in center
+      ctx.fillStyle = config.color;
+      ctx.font = `${size * 0.6}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(config.icon, pos.x, pos.y);
+
+      // Label
+      ctx.fillStyle = isHovered || isSelected ? '#ffffff' : 'rgba(255,255,255,0.7)';
+      ctx.font = `${isHovered || isSelected ? '12px' : '10px'} "Geist", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        pos.node.label.length > 16 ? pos.node.label.slice(0, 14) + '...' : pos.node.label,
+        pos.x,
+        pos.y + size + 12
+      );
+    });
+
+    ctx.restore();
+  }, [dimensions, nodePositions, filteredEdges, hoveredNode, selectedNodeId, zoom, pan]);
+
+  // Animation loop
+  useEffect(() => {
+    const animate = (time: number) => {
+      timeRef.current = time;
+      draw(time);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    animationRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationRef.current);
+  }, [draw]);
+
+  // Handle mouse interactions
+  const getNodeAtPosition = useCallback((clientX: number, clientY: number): NodePosition | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (clientX - rect.left - dimensions.width / 2) / zoom + dimensions.width / 2 - pan.x;
+    const y = (clientY - rect.top - dimensions.height / 2) / zoom + dimensions.height / 2 - pan.y;
+
+    for (const pos of nodePositions) {
+      const size = pos.node.type === 'root' ? 28 : 20;
+      const dx = pos.x - x;
+      const dy = pos.y - y;
+      if (dx * dx + dy * dy < size * size) {
+        return pos;
+      }
+    }
+    return null;
+  }, [nodePositions, dimensions, zoom, pan]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isDragging.current) {
+      const dx = e.clientX - lastMousePos.current.x;
+      const dy = e.clientY - lastMousePos.current.y;
+      setPan(p => ({ x: p.x + dx / zoom, y: p.y + dy / zoom }));
+      lastMousePos.current = { x: e.clientX, y: e.clientY };
+      return;
+    }
+
+    const nodePos = getNodeAtPosition(e.clientX, e.clientY);
+    setHoveredNode(nodePos?.node.id || null);
+    
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = nodePos ? 'pointer' : 'grab';
+    }
+  }, [getNodeAtPosition, zoom]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const nodePos = getNodeAtPosition(e.clientX, e.clientY);
+    if (!nodePos) {
+      isDragging.current = true;
+      lastMousePos.current = { x: e.clientX, y: e.clientY };
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = 'grabbing';
+      }
+    }
+  }, [getNodeAtPosition]);
+
+  const handleMouseUp = useCallback(() => {
+    isDragging.current = false;
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = hoveredNode ? 'pointer' : 'grab';
+    }
+  }, [hoveredNode]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (isDragging.current) return;
+    const nodePos = getNodeAtPosition(e.clientX, e.clientY);
+    onNodeSelect(nodePos?.node || null);
+  }, [getNodeAtPosition, onNodeSelect]);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(z => Math.min(Math.max(z * delta, 0.3), 3));
+  }, []);
+
+  return (
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden">
+      <canvas
+        ref={canvasRef}
+        style={{ width: dimensions.width, height: dimensions.height }}
+        onMouseMove={handleMouseMove}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onClick={handleClick}
+        onWheel={handleWheel}
+      />
+      
+      {/* Zoom controls */}
+      <div className="absolute bottom-4 right-4 flex gap-2">
+        <button
+          onClick={() => setZoom(z => Math.min(z * 1.2, 3))}
+          className="w-8 h-8 bg-secondary/80 backdrop-blur-sm rounded-md flex items-center justify-center text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors"
+        >
+          +
+        </button>
+        <button
+          onClick={() => setZoom(z => Math.max(z * 0.8, 0.3))}
+          className="w-8 h-8 bg-secondary/80 backdrop-blur-sm rounded-md flex items-center justify-center text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors"
+        >
+          −
+        </button>
+        <button
+          onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
+          className="px-3 h-8 bg-secondary/80 backdrop-blur-sm rounded-md flex items-center justify-center text-xs text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors"
+        >
+          Reset
+        </button>
+      </div>
+
+      {/* Legend */}
+      <div className="absolute top-4 right-4 bg-card/80 backdrop-blur-sm rounded-lg p-3 border border-border/50">
+        <div className="text-xs text-muted-foreground mb-2">Components</div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {Object.entries(nodeTypeConfig).slice(1).map(([type, config]) => (
+            <div key={type} className="flex items-center gap-2 text-xs">
+              <span style={{ color: config.color }}>{config.icon}</span>
+              <span className="text-foreground/70 capitalize">{type.replace('-', ' ')}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
