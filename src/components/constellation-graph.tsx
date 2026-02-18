@@ -416,6 +416,24 @@ export function ConstellationGraph({
     setZoom(z => Math.min(Math.max(z * delta, 0.3), 3));
   }, []);
 
+  // Zoom with + / - keys (Google Maps style)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('input, textarea, [contenteditable="true"]')) return;
+
+      if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        setZoom(z => Math.min(z * 1.2, 3));
+      } else if (e.key === '-') {
+        e.preventDefault();
+        setZoom(z => Math.max(z * 0.8, 0.3));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div ref={containerRef} className="w-full h-full relative overflow-hidden">
       <canvas
