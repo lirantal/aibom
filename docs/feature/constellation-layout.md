@@ -4,7 +4,7 @@
 
 The app screen is organized as follows:
 
-- **Header (top, full width):** Evo by Snyk logo, “AI-BOM” label, search (⌘K), then on the right: components filter dropdown (multi-select with checkboxes; see [Components filter (multi-select)](#components-filter-multi-select)), “Zoom to Fit”, and “Show JSON”. The header is fixed; the main content scrolls underneath if needed.
+- **Header (top, full width):** Evo by Snyk logo, “AI-BOM” label, search (⌘K), then on the right: components filter dropdown (multi-select with checkboxes; see [Components filter (multi-select)](#components-filter-multi-select)), “Zoom to Fit”, “Show JSON”, and “Upload JSON”. The header is fixed; the main content scrolls underneath if needed.
 - **Main area:** The constellation graph (radial/orbital node layout) fills the space below the header.
 - **Top-left overlay:** Dashboard stat cards — total **Components** plus one card per component type that appears in the current BOM (e.g. MCP Client, MCP Server, Agent, Model, Library, …). Cards wrap when there are many types. See [Dashboard cards stats](./dashboard-cards-stats.md).
 - **Bottom-left:** Two elements side by side:

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { Filter, Code2, Maximize2, Search, ChevronDown, ChevronRight, Copy, Check } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Filter, Code2, Maximize2, Search, ChevronDown, ChevronRight, Copy, Check, Upload } from 'lucide-react';
 import { ConstellationGraph, type ConstellationGraphHandle } from './components/constellation-graph';
 import { NodeDetailPanel } from './components/node-detail-panel';
-import { type GraphNode, type NodeType, bomData, graphData, nodeTypeConfig, constellationRingOrder } from './lib/graph-data';
+import { type CycloneDXBom, type GraphNode, type NodeType, defaultBomData, getGraphData, nodeTypeConfig, constellationRingOrder } from './lib/graph-data';
 
 const EVO_LOGO_DARK_URL =
   'https://res.cloudinary.com/snyk/image/upload/snyk-mktg-brandui/brand-logos/evo-logo-dark-mode.svg';
@@ -31,7 +31,18 @@ function getFilterIdForNodeType(type: NodeType): string | null {
   }
 }
 
+function isValidCycloneDXBom(value: unknown): value is CycloneDXBom {
+  if (!value || typeof value !== 'object') return false;
+  const o = value as Record<string, unknown>;
+  return (
+    Array.isArray(o.components) &&
+    Array.isArray(o.dependencies) &&
+    (o.bomFormat === 'CycloneDX' || typeof o.specVersion === 'string')
+  );
+}
+
 export default function App() {
+  const [currentBom, setCurrentBom] = useState<CycloneDXBom>(defaultBomData);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [showJSON, setShowJSON] = useState(false);
   const [selectedFilterIds, setSelectedFilterIds] = useState<Set<string>>(new Set());
@@ -39,8 +50,12 @@ export default function App() {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [jsonCopied, setJsonCopied] = useState(false);
   const [legendExpanded, setLegendExpanded] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const graphRef = useRef<ConstellationGraphHandle>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const graphData = useMemo(() => getGraphData(currentBom), [currentBom]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -55,12 +70,35 @@ export default function App() {
 
   const copyJsonToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(bomData, null, 2));
+      await navigator.clipboard.writeText(JSON.stringify(currentBom, null, 2));
       setJsonCopied(true);
       setTimeout(() => setJsonCopied(false), 2000);
     } catch {
       setJsonCopied(false);
     }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = reader.result as string;
+        const parsed = JSON.parse(text) as unknown;
+        if (!isValidCycloneDXBom(parsed)) {
+          setUploadError('Invalid AI-BOM: must have components, dependencies, and bomFormat/specVersion');
+          return;
+        }
+        setCurrentBom(parsed);
+        setSelectedNode(null);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : 'Invalid JSON');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   };
 
   const filterButtonLabel =
@@ -200,8 +238,40 @@ export default function App() {
             <Code2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Show JSON</span>
           </button>
+
+          {/* Upload JSON */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            className="hidden"
+            onChange={handleFileSelect}
+            aria-label="Upload AI-BOM JSON"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="h-8 px-3 bg-secondary/40 hover:bg-secondary/60 border border-border/50 rounded-md text-sm text-foreground flex items-center gap-2 transition-colors"
+            title="Upload AI-BOM JSON file"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline text-foreground/80">Upload JSON</span>
+          </button>
         </div>
       </header>
+
+      {uploadError && (
+        <div className="flex items-center justify-between gap-4 px-4 py-2 bg-destructive/15 border-b border-destructive/30 text-sm text-destructive">
+          <span>{uploadError}</span>
+          <button
+            type="button"
+            onClick={() => setUploadError(null)}
+            className="shrink-0 px-2 py-1 rounded hover:bg-destructive/20 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
@@ -209,6 +279,7 @@ export default function App() {
         <main className="flex-1 relative">
           <ConstellationGraph
             ref={graphRef}
+            graphData={graphData}
             onNodeSelect={setSelectedNode}
             selectedNodeId={selectedNode?.id || null}
             selectedFilterIds={Array.from(selectedFilterIds)}
@@ -292,7 +363,7 @@ export default function App() {
             <div className="h-9 flex items-center gap-1.5 bg-card/60 backdrop-blur-md rounded-md px-3 border border-border/30 shrink-0">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">CycloneDX</span>
               <span className="inline-flex items-center justify-center px-2 h-5 rounded text-xs font-medium bg-accent/20 text-accent border border-accent/30">
-                v{bomData.specVersion}
+                v{currentBom.specVersion}
               </span>
             </div>
           </div>
@@ -320,7 +391,7 @@ export default function App() {
                 </div>
               </div>
               <pre className="p-3 text-xs font-mono text-green-400 overflow-auto max-h-64">
-                {JSON.stringify(bomData, null, 2)}
+                {JSON.stringify(currentBom, null, 2)}
               </pre>
             </div>
           )}

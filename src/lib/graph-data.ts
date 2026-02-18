@@ -228,7 +228,10 @@ export const nodeTypeConfig: Record<NodeType, { color: string; bgColor: string; 
 // AI-BOM data (CycloneDX format) — edit root data.json to change the graph
 import bomDataJson from '../../data.json';
 
-export const bomData: CycloneDXBom = bomDataJson as CycloneDXBom;
+/** Default BOM loaded from data.json; used as initial state and for reset. */
+export const defaultBomData: CycloneDXBom = bomDataJson as CycloneDXBom;
 
-// Export the converted graph data
-export const graphData: GraphData = bomToGraphData(bomData);
+/** Convert BOM to graph; use defaultBomData or uploaded JSON. */
+export function getGraphData(bom: CycloneDXBom): GraphData {
+  return bomToGraphData(bom);
+}

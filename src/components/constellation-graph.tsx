@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { constellationRingOrder, graphData, nodeTypeConfig, type GraphNode } from '../lib/graph-data';
+import { constellationRingOrder, nodeTypeConfig, type GraphData, type GraphNode } from '../lib/graph-data';
 import { fuzzyMatchAny } from '../lib/fuzzy-match';
 
 interface NodePosition {
@@ -28,11 +28,13 @@ function nodeMatchesFilterIds(node: GraphNode, selectedFilterIds: string[]): boo
 }
 
 export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
+  graphData: GraphData;
   onNodeSelect: (node: GraphNode | null) => void;
   selectedNodeId: string | null;
   selectedFilterIds: string[];
   searchQuery?: string;
 }>(function ConstellationGraph({
+  graphData,
   onNodeSelect,
   selectedNodeId,
   selectedFilterIds,
@@ -62,7 +64,7 @@ export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
       });
     }
     return nodes;
-  }, [selectedFilterIds, searchQuery]);
+  }, [graphData.nodes, selectedFilterIds, searchQuery]);
 
   // Calculate node positions in a radial constellation layout
   const nodePositions = useMemo(() => {
@@ -149,7 +151,7 @@ export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
     return graphData.edges.filter(
       edge => visibleNodeIds.has(edge.from) && visibleNodeIds.has(edge.to)
     );
-  }, [filteredNodes]);
+  }, [graphData.edges, filteredNodes]);
 
   // Handle resize
   useEffect(() => {
