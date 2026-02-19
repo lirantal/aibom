@@ -46,7 +46,7 @@ The set of type cards depends on what the BOM contains. The possible types (and 
 | `tool`        | MCP Tool       | `tool:`                                |
 | `service`     | Service        | `service:` or BOM services             |
 | `application`| Application    | `application:`                         |
-| `data`        | Data           | (fallback)                             |
+| `data`        | Data           | `dataset:` or (fallback)               |
 
 Again: only types that have at least one node in the current graph get a card.
 
@@ -70,7 +70,8 @@ The dashboard type cards are **connected to the header components filter**: clic
   - **Library** → filter "Libraries".
   - **Service** → filter "Services".
   - **MCP Tool** / **MCP Resource** → filter "Tools & Resources" (both types).
-- **Type cards with no filter (e.g. Application, Data):** Not clickable; they only show the count.
+  - **Data** → filter "Data".
+- **Type cards with no filter (e.g. Application):** Not clickable; they only show the count.
 
 Clickable cards use hover styles (e.g. slightly stronger background and border), a tooltip ("Show only X" or "Clear filter (show all)" when that card is the active filter), and keyboard support (Enter/Space) for accessibility. The header filter dropdown and the dashboard cards stay in sync: after clicking a card, the dropdown shows that single filter as selected; clearing in the dropdown or by clicking the same card again both reset to all components.
 

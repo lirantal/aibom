@@ -106,6 +106,7 @@ export function getNodeType(bomRef: string): NodeType {
   if (bomRef.startsWith('tool:')) return 'tool';
   if (bomRef.startsWith('service:')) return 'service';
   if (bomRef.startsWith('application:')) return 'application';
+  if (bomRef.startsWith('dataset:')) return 'data';
   return 'data';
 }
 

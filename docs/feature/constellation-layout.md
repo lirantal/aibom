@@ -25,15 +25,15 @@ The layout is a **radial / orbital** layout: nodes sit on concentric circles (ri
 
 ## How many circles and why
 
-- **Drawn circles:** The canvas always draws **8 orbital rings** (see `constellation-graph.tsx`: loop `for (let i = 1; i <= 8; i++)` with radius `80 + i * 90`). So visually there are 8 circles.
+- **Drawn circles:** The canvas draws a number of orbital rings equal to **constellation types + 1** (see `constellation-graph.tsx`: `numRings = constellationRingOrder.length + 1`, radius `80 + i * 90` per ring). So there are 10 rings: one per type in `constellationRingOrder` (mcp-client through data) plus one for other application nodes.
 - **Used circles:** How many rings actually get nodes depends on:
   - The **type order** (see below): we have 9 non-root types + optionally one extra ring for “other” application nodes.
   - The **data**: only types that have nodes in the current (filtered) set get a ring.
   - So with “All components” you might use e.g. rings 1–5 if you only have mcp-client, mcp-server, agent, model, and maybe application; with a single-type filter, previously we used only ring 1 (see fix below).
 
-The choice of **8 drawn rings** is a reasonable upper bound so the canvas doesn’t look empty when many types are present, while keeping the radial spacing (90px per ring) readable.
+The number of **drawn rings** is dynamic so that the outermost type (e.g. Data) always has a visible ring when present, while keeping the radial spacing (90px per ring) readable.
 
-**Grid and ring styling:** The background grid is drawn so it fully contains all 8 rings (extent = max ring radius 800px + 160px margin). Orbital rings use a white stroke with opacity that steps down from inner to outer rings (e.g. ~0.18 to ~0.06) so they stay visible without overpowering the nodes.
+**Grid and ring styling:** The background grid is drawn so it fully contains all rings (extent = max ring radius for `numRings` + 160px margin). Orbital rings use a white stroke with opacity that steps down from inner to outer rings (e.g. ~0.18 to ~0.06) so they stay visible without overpowering the nodes.
 
 ---
 
@@ -89,7 +89,7 @@ The header filter dropdown lets users show **one or more** component types at on
   - **One or more types selected** = only those types are shown. A node is included if its type matches any selected filter (e.g. “MCP Servers” includes both `mcp-server` and `mcp-client`).
 
 - **UI:**  
-  - Each option has a **checkbox** to the left of the label (Models, Agents, MCP Servers, Libraries, Services, Tools & Resources).  
+  - Each option has a **checkbox** to the left of the label (Models, Agents, MCP Servers, Libraries, Services, Tools & Resources, Data).  
   - Checked = that type is included in the filter. Clicking a row toggles that type; the menu stays open so multiple options can be selected.  
   - The button label shows: “All Components” when none selected; the single type name when one is selected; or “N types” when multiple are selected (e.g. “2 types”).  
   - A **“Clear all filters”** action at the bottom of the dropdown clears the selection (back to “All Components”) and closes the menu.

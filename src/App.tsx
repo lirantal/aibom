@@ -14,9 +14,10 @@ const COMPONENT_FILTERS = [
   { id: 'libraries', label: 'Libraries' },
   { id: 'services', label: 'Services' },
   { id: 'tools', label: 'Tools & Resources' },
+  { id: 'data', label: 'Data' },
 ] as const;
 
-/** Map node type to header filter id; null if type has no filter (e.g. application, data). */
+/** Map node type to header filter id; null if type has no filter (e.g. application). */
 function getFilterIdForNodeType(type: NodeType): string | null {
   switch (type) {
     case 'model': return 'models';
@@ -27,6 +28,7 @@ function getFilterIdForNodeType(type: NodeType): string | null {
     case 'service': return 'services';
     case 'tool':
     case 'mcp-resource': return 'tools';
+    case 'data': return 'data';
     default: return null;
   }
 }

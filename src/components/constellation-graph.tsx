@@ -23,6 +23,7 @@ function nodeMatchesFilterIds(node: GraphNode, selectedFilterIds: string[]): boo
     if (id === 'tools' && (node.type === 'tool' || node.type === 'mcp-resource')) return true;
     if (id === 'libraries' && node.type === 'library') return true;
     if (id === 'services' && node.type === 'service') return true;
+    if (id === 'data' && node.type === 'data') return true;
   }
   return false;
 }
@@ -204,7 +205,8 @@ export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
     // Draw subtle grid (large enough to cover all orbital rings)
     const centerX = dimensions.width / 2;
     const centerY = dimensions.height / 2;
-    const maxRingRadius = 80 + 8 * 90;
+    const numRingsForGrid = constellationRingOrder.length + 1;
+    const maxRingRadius = 80 + numRingsForGrid * 90;
     const gridExtent = maxRingRadius + 160;
     const gridMinX = centerX - gridExtent;
     const gridMaxX = centerX + gridExtent;
@@ -225,8 +227,9 @@ export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
       ctx.stroke();
     }
 
-    // Draw orbital rings (opacity tuned so rings are visible but not dominant)
-    for (let i = 1; i <= 8; i++) {
+    // Draw orbital rings (one per constellation type + application ring)
+    const numRings = constellationRingOrder.length + 1;
+    for (let i = 1; i <= numRings; i++) {
       const radius = 80 + i * 90;
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
