@@ -1,0 +1,2 @@
+# npmjs.com often returns 403 for automated/bot requests; links are valid
+accept = ["200", "403"]

@@ -13,7 +13,7 @@
   <a href="https://www.npmjs.com/package/ai-bom-visualizer"><img src="https://badgen.net/npm/license/ai-bom-visualizer" alt="license"/></a>
   <a href="https://www.npmjs.com/package/ai-bom-visualizer"><img src="https://badgen.net/npm/dt/ai-bom-visualizer" alt="downloads"/></a>
   <a href="https://github.com/lirantal/ai-bom-visualizer/actions?workflow=CI"><img src="https://github.com/lirantal/ai-bom-visualizer/workflows/CI/badge.svg" alt="build"/></a>
-  <a href="https://codecov.io/gh/lirantal/ai-bom-visualizer"><img src="https://badgen.net/codecov/c/github/lirantal/ai-bom-visualizer" alt="codecov"/></a>
+  <a href="https://app.codecov.io/gh/lirantal/ai-bom-visualizer"><img src="https://badgen.net/codecov/c/github/lirantal/ai-bom-visualizer" alt="codecov"/></a>
   <a href="https://snyk.io/test/github/lirantal/ai-bom-visualizer"><img src="https://snyk.io/test/github/lirantal/ai-bom-visualizer/badge.svg" alt="Known Vulnerabilities"/></a>
   <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Responsible Disclosure Policy" /></a>
 </p>
@@ -59,7 +59,7 @@ This runs `build:template:root` (builds the template in the repo root), then `ts
 
 ## Contributing
 
-Please consult [CONTRIBUTING](./.github/CONTRIBUTING.md) for guidelines on contributing to this project.
+Please consult [CONTRIBUTING](../../.github/CONTRIBUTING.md) for guidelines on contributing to this project.
 
 ## Author
 
