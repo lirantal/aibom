@@ -1,11 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config/schema.json",
-  "changelog": [
-    "@changesets/changelog-github",
-    {
-      "repo": "lirantal/ai-bom-visualizer"
-    }
-  ],
+  "changelog": ["@changesets/changelog-github", { "repo": "lirantal/ai-bom-visualizer" }],
   "commit": false,
   "fixed": [],
   "linked": [],

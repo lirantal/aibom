@@ -17,9 +17,6 @@ jobs:
       packages: write       # to publish to npm (changesets/action)
     timeout-minutes: 20
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/ai-bom-visualizer
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -31,20 +28,19 @@ jobs:
           cache: 'pnpm'
       - name: install root dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: .
       - name: build root HTML template
         run: pnpm run build:template
-        working-directory: .
       - name: install dependencies
         run: npm ci
+        working-directory: packages/ai-bom-visualizer
       - name: build project
         run: npm run build
+        working-directory: packages/ai-bom-visualizer
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@v1
         with:
-          cwd: packages/ai-bom-visualizer
-          publish: npm run release
-          version: npm run version
+          version: pnpm run version
+          publish: pnpm run release
           commit: "chore: new release"
           title: "chore: new release candidate"
         env:

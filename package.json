@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "build:template": "BUILD_TEMPLATE=1 vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -18,6 +20,8 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.7",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
