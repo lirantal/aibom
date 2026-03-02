@@ -22,7 +22,11 @@ function openInBrowser (filePath: string): void {
     command = 'xdg-open'
     args = [absolutePath]
   }
-  spawn(command, args, { stdio: 'ignore', shell: platform === 'win32' })
+  const child = spawn(command, args, { stdio: 'ignore', shell: platform === 'win32' })
+  child.unref()
+  child.on('error', () => {
+    // Silently ignore – opener is best-effort (e.g. xdg-open missing in containers)
+  })
 }
 
 /**
