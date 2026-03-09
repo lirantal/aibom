@@ -13,12 +13,12 @@ snyk aibom --experimental --json | npx aibom --view
 ## Project structure
 
 - **`src/bin/cli.ts`** — CLI entrypoint. Parses arguments with Node’s `util.parseArgs()`, reads JSON (stdin or `--file`), resolves the viewer template path, and calls the runner.
-- **`src/lib/run.ts`** — Core flow: validate JSON/CycloneDX, load template, inject BOM, write HTML, optionally open in browser (via injectable opener).
+- **`src/lib/run.ts`** — Core flow. Exports `render()` (validate JSON/CycloneDX, load template, inject BOM, return HTML string) and `run()` (calls `render()`, writes HTML to disk, optionally opens in browser via injectable opener).
 - **`src/lib/inject.ts`** — Replaces the placeholder token in the template with the BOM JSON and escapes `</script>` for safe embedding.
 - **`src/lib/template-path.ts`** — Resolves the path to the bundled `viewer-template.html` relative to the bin directory.
 - **`src/lib/open-browser.ts`** — Cross-platform “open in browser” (macOS `open`, Linux `xdg-open`, Windows `start`). Opener is injectable for tests.
-- **`src/lib/serve.ts`** — Local HTTP server that serves the generated HTML file on `localhost:8081`. Used by the `--serve` CLI flag.
-- **`src/main.ts`** — Library exports: `run`, `injectBomIntoHtml`, `PLACEHOLDER_TOKEN`, `serve`.
+- **`src/lib/serve.ts`** — Local HTTP server that serves HTML on `localhost:8081`. Accepts either a file path (reads from disk) or an in-memory HTML string. Used by the `--serve` CLI flag.
+- **`src/main.ts`** — Library exports: `run`, `render`, `injectBomIntoHtml`, `PLACEHOLDER_TOKEN`, `serve`.
 - **`scripts/copy-template.mjs`** — ESM script used at build time to copy the root project’s `dist/index.html` into this package’s `dist/viewer-template.html`.
 
 ## Relationship with the root visualizer HTML
@@ -27,7 +27,7 @@ This CLI lives in **`packages/aibom`** inside the **ai-bom-html** repo. The root
 
 - **Root** runs `npm run build:template` (`BUILD_TEMPLATE=1 vite build`) and produces **`dist/index.html`** with a placeholder `{{{PLACEHOLDER_JSON_TOKEN}}}` inside `<script type="application/json" id="bom-data">…</script>`.
 - The **CLI build** depends on that template: it runs `npm run build:template --prefix ../..`, then copies **`../../dist/index.html`** to **`dist/viewer-template.html`** so the published package contains the viewer.
-- At runtime the CLI reads `dist/viewer-template.html`, replaces the placeholder with the user’s BOM JSON, and writes the result (e.g. `ai-bom-visual-output-HH-mm-ss.html`). The same placeholder appears once in the HTML script tag and once as a string in the bundled JS; only the script-tag occurrence is replaced.
+- At runtime the CLI reads `dist/viewer-template.html` and replaces the placeholder with the user’s BOM JSON. By default it writes the result to a file (e.g. `ai-bom-visual-output-HH-mm-ss.html`); with `--serve` alone the HTML is kept in memory and served directly without writing to disk. The same placeholder appears once in the HTML script tag and once as a string in the bundled JS; only the script-tag occurrence is replaced.
 
 See the root docs **`docs/html-template.md`** and **`docs/project.md`** for how the template build and BOM injection work.
 
@@ -40,7 +40,7 @@ From **`packages/aibom`**:
 npm test
 ```
 
-- **Unit tests** (`__tests__/inject.test.ts`, `template-path.test.ts`, `run.test.ts`, `app.test.ts`) — Test inject, template path, `run()` with mock opener, and main exports. They do not require a prior build.
+- **Unit tests** (`__tests__/inject.test.ts`, `template-path.test.ts`, `run.test.ts`, `serve.test.ts`, `app.test.ts`) — Test inject, template path, `run()`/`render()` with mock opener, `serve()` with file and in-memory HTML, and main exports. They do not require a prior build.
 - **E2E tests** (`__tests__/cli.e2e.test.ts`) — Spawn the built CLI (`dist/bin/cli.cjs`) with stdin / `--file` / `--output` / invalid JSON / `--view`. They are **skipped** if `dist/bin/cli.cjs` or `dist/viewer-template.html` is missing. Run **`npm run build`** first to execute e2e tests.
 
 Coverage is reported by **c8** (see `package.json` scripts and `c8` config).
@@ -54,6 +54,7 @@ To run the CLI from source (e.g. `node --import tsx src/bin/cli.ts` or `npm run 
    - `cat bom.json | npm run start`
    - `cat bom.json | npm run start -- --view`
    - `npm run start -- --file ./bom.json --view`
+   - `npm run start -- --file ./bom.json --serve`
 
 If you run the CLI with no input (no pipe and no `--file`) in an interactive terminal, it exits with a message instead of waiting: *"No input provided. Pipe AI-BOM JSON to stdin or use --file <path>. See --help."* Use **`--help`** to print usage.
 
