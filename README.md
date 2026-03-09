@@ -37,7 +37,7 @@ Watch a demo of the AIBOM CLI together with the Snyk CLI that generates the AIBO
 
 ## Deployed Version
 
-The AI-BOM Visualizer project is also deployed live here for public use: [https://ai-bom-visualizer.vercel.app](https://ai-bom-visualizer.vercel.app)
+The AI-BOM Visualizer is also deployed live here for public use: [https://ai-bom-visualizer.vercel.app](https://ai-bom-visualizer.vercel.app)
 
 ## Quickstart for AI BOM Visualizer package
 
