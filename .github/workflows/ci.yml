@@ -28,8 +28,6 @@ jobs:
       - name: build root HTML template
         run: pnpm run build:template
         working-directory: .
-      - name: install dependencies
-        run: npm ci
       - name: lint code
         run: npm run lint
       - name: build project

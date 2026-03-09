@@ -32,9 +32,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: build root HTML template
         run: pnpm run build:template
-      - name: install dependencies
-        run: npm ci
-        working-directory: packages/aibom
       - name: build project
         run: npm run build
         working-directory: packages/aibom
