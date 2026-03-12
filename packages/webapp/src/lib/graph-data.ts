@@ -1,3 +1,5 @@
+import { sanitizeDisplayText } from "./sanitize";
+
 // CycloneDX AI-BOM Types
 export interface BomEvidence {
   identity?: Array<{
@@ -118,10 +120,11 @@ export function bomToGraphData(bom: CycloneDXBom): GraphData {
   // Add components as nodes
   for (const component of bom.components) {
     const type = getNodeType(component['bom-ref']);
+    const rawLabel = component.name.split('/').pop() || component.name
     nodes.push({
       id: component['bom-ref'],
-      label: component.name.split('/').pop() || component.name,
-      fullName: component.name,
+      label: sanitizeDisplayText(rawLabel),
+      fullName: sanitizeDisplayText(component.name),
       type,
       raw: component,
     });
@@ -132,8 +135,8 @@ export function bomToGraphData(bom: CycloneDXBom): GraphData {
     for (const service of bom.services) {
       nodes.push({
         id: service['bom-ref'],
-        label: service.name,
-        fullName: service.name,
+        label: sanitizeDisplayText(service.name),
+        fullName: sanitizeDisplayText(service.name),
         type: 'service',
         raw: service,
       });
