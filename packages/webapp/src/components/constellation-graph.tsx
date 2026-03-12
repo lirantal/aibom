@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { constellationRingOrder, nodeTypeConfig, type GraphData, type GraphNode } from '../lib/graph-data';
 import { fuzzyMatchAny } from '../lib/fuzzy-match';
+import { sanitizeCanvasLabel } from '@/lib/sanitize';
 
 interface NodePosition {
   x: number;
@@ -364,7 +365,8 @@ export const ConstellationGraph = forwardRef<ConstellationGraphHandle, {
       ctx.fillStyle = isHovered || isSelected ? '#ffffff' : 'rgba(255,255,255,0.7)';
       ctx.font = `19px sans-serif`;
       ctx.textAlign = 'center';
-      const displayLabel = pos.node.label.length > 18 ? pos.node.label.slice(0, 16) + '...' : pos.node.label;
+
+      const displayLabel = sanitizeCanvasLabel(pos.node.label, 18);
       ctx.fillText(displayLabel, pos.x, pos.y + size + 16);
     });
 
