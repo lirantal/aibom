@@ -6,7 +6,6 @@ A toolkit and visualizer for **AI Bill of Materials** (AI-BOM). Pipe any Cyclone
 [![license](https://img.shields.io/npm/l/aibom)](packages/aibom/LICENSE)
 [![codecov](https://img.shields.io/codecov/c/gh/lirantal/aibom/main)](https://codecov.io/gh/lirantal/aibom)
 [![CI](https://img.shields.io/github/actions/workflow/status/lirantal/aibom/ci.yml?branch=main&label=CI&logo=github)](https://github.com/lirantal/aibom/actions/workflows/ci.yml?query=branch%3Amain)
-[![Known Vulnerabilities](https://snyk.io/test/github/lirantal/aibom/badge.svg)](https://snyk.io/test/github/lirantal/aibom)
 [![Security Responsible Disclosure](https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow)](packages/aibom/SECURITY.md)
 
 TL;DR how to use AI-BOM:
