@@ -106,8 +106,8 @@ importers:
         specifier: ^8.0.8
         version: 8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-singlefile:
-        specifier: ^2.0.0
-        version: 2.3.0(rollup@4.59.0)(vite@8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2))
+        specifier: ^2.3.3
+        version: 2.3.3(rollup@4.59.0)(vite@8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2))
 
 packages:
 
@@ -2842,12 +2842,15 @@ packages:
     engines: {node: '>=16.0.0'}
     hasBin: true
 
-  vite-plugin-singlefile@2.3.0:
-    resolution: {integrity: sha512-DAcHzYypM0CasNLSz/WG0VdKOCxGHErfrjOoyIPiNxTPTGmO6rRD/te93n1YL/s+miXq66ipF1brMBikf99c6A==}
+  vite-plugin-singlefile@2.3.3:
+    resolution: {integrity: sha512-XVnGH0QzbOa8fxRSsHdCarVN1BSBXNi7uLMQYlrGRN5apdHkk62XQWRJhVever0lnfuyBkwn+kvVChdm/OoOUg==}
     engines: {node: '>18.0.0'}
     peerDependencies:
-      rollup: ^4.44.1
-      vite: ^5.4.11 || ^6.0.0 || ^7.0.0
+      rollup: ^4.59.0
+      vite: ^5.4.21 || ^6.0.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
 
   vite@8.0.8:
     resolution: {integrity: sha512-dbU7/iLVa8KZALJyLOBOQ88nOXtNG8vxKuOT4I2mD+Ya70KPceF4IAmDsmU0h1Qsn5bPrvsY9HJstCRh3hG6Uw==}
@@ -5513,6 +5516,7 @@ snapshots:
       '@rollup/rollup-win32-x64-gnu': 4.59.0
       '@rollup/rollup-win32-x64-msvc': 4.59.0
       fsevents: 2.3.3
+    optional: true
 
   run-parallel@1.2.0:
     dependencies:
@@ -5928,11 +5932,12 @@ snapshots:
 
   validate-conventional-commit@1.0.4: {}
 
-  vite-plugin-singlefile@2.3.0(rollup@4.59.0)(vite@8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2)):
+  vite-plugin-singlefile@2.3.3(rollup@4.59.0)(vite@8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       micromatch: 4.0.8
-      rollup: 4.59.0
       vite: 8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2)
+    optionalDependencies:
+      rollup: 4.59.0
 
   vite@8.0.8(@types/node@20.19.33)(esbuild@0.27.3)(jiti@1.21.7)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
