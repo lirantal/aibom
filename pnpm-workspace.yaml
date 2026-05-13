@@ -1,6 +1,8 @@
 # npm security best practices
 # Source: https://github.com/lirantal/npm-security-best-practices
 
+packages:
+  - 'packages/*'
 
 # Require at least 30 days since package release (specified in minutes)
 minimumReleaseAge: 43200
