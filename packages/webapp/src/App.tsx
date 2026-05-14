@@ -1,11 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Filter, Code2, Maximize2, Search, ChevronDown, ChevronRight, Copy, Check, Upload, Github } from 'lucide-react';
+import { type SVGProps, useEffect, useMemo, useRef, useState } from 'react';
+import { Filter, Code2, Maximize2, Search, ChevronDown, ChevronRight, Copy, Check, Upload } from 'lucide-react';
 import { ConstellationGraph, type ConstellationGraphHandle } from './components/constellation-graph';
 import { NodeDetailPanel } from './components/node-detail-panel';
 import { type CycloneDXBom, type GraphNode, type NodeType, getDefaultBomFromDOM, getGraphData, nodeTypeConfig, constellationRingOrder } from './lib/graph-data';
 
 const EVO_LOGO_DARK_URL =
   'https://res.cloudinary.com/snyk/image/upload/snyk-mktg-brandui/brand-logos/evo-logo-dark-mode.svg';
+
+function GitHubIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.5 2.87 8.32 6.84 9.69.5.1.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.71 0 0 .84-.28 2.75 1.05A9.29 9.29 0 0 1 12 6.65c.85 0 1.7.12 2.5.34 1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.38-.01 2.48-.01 2.82 0 .27.18.59.69.49A10.17 10.17 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" />
+    </svg>
+  );
+}
 
 const COMPONENT_FILTERS = [
   { id: 'models', label: 'Models' },
@@ -270,7 +278,7 @@ export default function App() {
             className="h-8 w-8 bg-secondary/40 hover:bg-secondary/60 border border-border/50 rounded-md flex items-center justify-center transition-colors"
             title="View on GitHub"
           >
-            <Github className="w-4 h-4 text-foreground/70" />
+            <GitHubIcon className="w-4 h-4 text-foreground/70" />
           </a>
         </div>
       </header>
