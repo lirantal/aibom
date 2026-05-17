@@ -70,7 +70,7 @@ Default BOM comes from **`data.json`** at project root (injected into the HTML a
 
 ## Contributing
 
-Please consult [CONTRIBUTING](../../.github/CONTRIBUTING.md) for guidelines on contributing to this project.
+Please consult [CONTRIBUTING](../../CONTRIBUTING.md) for guidelines on contributing to this project.
 
 ## Author
 
