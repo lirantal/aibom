@@ -58,3 +58,7 @@ Instead of `--view`, you can use the `--serve` flag to tell the `aibom` npm pack
 npx aibom --serve --port 8081
 ```
 
+
+## Contributing
+
+Please consult [CONTRIBUTING](./CONTRIBUTING.md) for guidelines on contributing to this project.
