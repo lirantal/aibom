@@ -30,3 +30,6 @@ strictDepBuilds: true
 
 # Block exotic subdependencies such as those pulled from  Git sources
 blockExoticSubdeps: true
+
+trustPolicyExclude:
+  - 'chokidar@4.0.3'
