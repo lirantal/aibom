@@ -1,6 +1,7 @@
 {
   "name": "aibom-monorepo",
   "private": true,
+  "packageManager": "pnpm@11.8.0",
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter ai-bom-viewer dev",

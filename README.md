@@ -58,6 +58,9 @@ Instead of `--view`, you can use the `--serve` flag to tell the `aibom` npm pack
 npx aibom --serve --port 8081
 ```
 
+## Documentation
+
+- [Project documentation](./docs/README.md) - development, testing, architecture, and conventions.
 
 ## Contributing
 

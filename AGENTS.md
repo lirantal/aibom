@@ -1,9 +1,35 @@
-# AI-BOM HTML — Agent context
+# AGENTS.md
 
-This is a pnpm monorepo with two packages:
+Guidance for AI coding agents working in this repository.
 
-1. **Webapp: AI-BOM Viewer (Vite/React)** in `packages/webapp` — A single-file HTML viewer for CycloneDX AI-BOM. Build with `pnpm run build` or `pnpm run build:template` from the repo root (proxy scripts delegate to the webapp). See `packages/webapp/docs/project.md` and `packages/webapp/docs/html-template.md` for build and data flow.
+## Start Here
 
-2. **CLI: aibom** in `packages/aibom` — A Node.js CLI that reads AI-BOM JSON (stdin or `--file`), injects it into the viewer template, and writes HTML (optionally opens with `--view`). Typical use: `snyk aibom --experimental --json | npx aibom --view`.
+Before making changes, read:
 
-For a deeper dive on the CLI (structure, tests, relationship with the webapp), see **[packages/aibom/docs/project.md](packages/aibom/docs/project.md)**.
+- `CONTRIBUTING.md` for contribution, PR, testing, commit, and agent-specific expectations.
+- `RELEASE.md` for release workflow details.
+- `README.md` for user-facing behavior, install/use examples, and package or app overview.
+- `docs/README.md` for the project documentation index.
+- `docs/development.md` for local setup and development workflows.
+- `docs/testing.md` for test strategy, commands, and verification expectations.
+- `docs/architecture.md` for project structure, boundaries, and important invariants.
+- `docs/conventions.md` for project-specific coding, documentation, and maintenance conventions.
+
+Treat those files as the source of truth. Do not duplicate or reinterpret their rules here.
+
+## Documentation
+
+- Keep documentation in sync when changing behavior, public interfaces, workflows, architecture, configuration, or operational assumptions.
+- Put project-specific development details in `docs/`; keep root files focused on their standard audiences.
+- Prefer linking to the source of truth over duplicating long instructions across files.
+- When adding new docs, link them from `docs/README.md` and update this file only when they become important entry points for future agents.
+
+## PRs and Issues
+
+- Follow PR, issue, and agent-labeling rules in `CONTRIBUTING.md`.
+- Use the issue-linking format specified in `CONTRIBUTING.md`.
+
+## Releases
+
+- Follow `RELEASE.md` for release workflow and changeset creation steps.
+- If this project uses changesets, treat `RELEASE.md` and any changeset guidance in `CONTRIBUTING.md` as authoritative.
