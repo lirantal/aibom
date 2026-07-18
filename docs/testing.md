@@ -4,7 +4,6 @@
 
 TODO: Document the primary test command for this repository.
 
-
 ## Expectations
 
 - Add or update tests for behavior changes.
