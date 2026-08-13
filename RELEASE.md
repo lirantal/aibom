@@ -25,7 +25,7 @@ Run the Changesets CLI and follow the prompts:
 npx @changesets/cli
 
 # pnpm
-pnpx @changesets/cli
+pnpm dlx @changesets/cli
 ```
 
 The CLI asks which package changed, what semver bump is needed, and what summary should go in the changelog. Use:
