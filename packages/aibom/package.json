@@ -91,7 +91,7 @@
     "tsup": "^8.1.0",
     "tsx": "^4.19.4",
     "typescript": "^5.5.3",
-    "validate-conventional-commit": "^1.0.4"
+    "validate-conventional-commit": "^2.0.0"
   },
   "lint-staged": {
     "**/*.{js,json}": [
