@@ -50,7 +50,7 @@ export function render (options: RenderOptions): string {
     template = fs.readFileSync(templatePath, 'utf8')
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    throw new Error(`Failed to read viewer template: ${message}. Run "npm run build" in the package directory so dist/viewer-template.html exists.`)
+    throw new Error(`Failed to read viewer template: ${message}. Run "npm run build" in the package directory so dist/viewer-template.html exists.`, { cause: err })
   }
 
   if (!template.includes(PLACEHOLDER_TOKEN)) {

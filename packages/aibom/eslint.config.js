@@ -1,15 +1,28 @@
+import js from '@eslint/js'
+import { defineConfig, globalIgnores } from 'eslint/config'
+import pluginN from 'eslint-plugin-n'
+import tseslint from 'typescript-eslint'
 import pluginSecurity from 'eslint-plugin-security'
-import neostandard, { resolveIgnoresFromGitignore, plugins } from 'neostandard'
 
-export default [
-  ...neostandard({
-    ignores: ['__tests__/**/*.ts', 'dist/**', 'scripts/**', ...resolveIgnoresFromGitignore()],
-    ts: true,   // Enable TypeScript support,
-    filesTs: ['src/**/*.ts', '__tests__/**/*.ts']
-  }),
-  plugins.n.configs['flat/recommended-script'],
+export default defineConfig([
+  globalIgnores([
+    '__tests__/**/*.ts',
+    'dist/**',
+    'scripts/**',
+    'coverage/**',
+    'node_modules/**'
+  ]),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  pluginN.configs['flat/recommended-script'],
   pluginSecurity.configs.recommended,
   {
+    settings: {
+      n: {
+        // Source imports use the .js extension emitted by TypeScript.
+        typescriptExtensionMap: [['.ts', '.js']]
+      }
+    },
     rules: {
       'n/no-process-exit': 'off',
       'n/no-unsupported-features': 'off',
@@ -36,4 +49,4 @@ export default [
       sourceType: 'module',
     },
   },
-]
+])
