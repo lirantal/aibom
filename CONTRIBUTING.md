@@ -60,9 +60,9 @@ This format drives changelog generation and release automation, so it matters mo
 ## Local development
 
 1. Fork and clone the repository.
-2. Install dependencies using the project's package manager (see `package.json`, or equivalent).
-3. Run the test suite to confirm a clean baseline before making changes.
-4. Run the linter and type checker (if configured) the same way.
+2. Use Node.js 24 (the CI version) and pnpm 11 or newer. Install from the repository root with `pnpm install --frozen-lockfile`; `pnpm-lock.yaml` is the workspace lockfile.
+3. Build the CLI and viewer template with `pnpm --filter aibom run build`, then run `pnpm --filter aibom test` so the CLI end-to-end tests execute.
+4. Run `pnpm --filter aibom run lint`. The build also runs the TypeScript checker.
 5. Make your change on a feature branch, commit using the format above, and open a PR.
 
 If any of the above doesn't work on a fresh checkout, that's a bug, please open an issue.

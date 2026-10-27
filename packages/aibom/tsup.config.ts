@@ -4,7 +4,10 @@ export default defineConfig([
   {
     entryPoints: ['src/main.ts', 'src/bin/cli.ts'],
     format: ['cjs', 'esm'],
-    dts: true,
+    dts: {
+      // tsup injects baseUrl while generating declarations, which TS 6 deprecates.
+      compilerOptions: { ignoreDeprecations: '6.0' }
+    },
     minify: false,
     outDir: 'dist/',
     clean: true,
