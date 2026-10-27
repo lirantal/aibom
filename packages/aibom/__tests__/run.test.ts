@@ -90,6 +90,21 @@ describe('run', () => {
 })
 
 describe('render', () => {
+  test('preserves the cause when reading the viewer template fails', (t) => {
+    const cause = new Error('Permission denied')
+    t.mock.method(fs, 'readFileSync', () => { throw cause })
+
+    assert.throws(
+      () => render({ bomJson: minimalBom, binDir: os.tmpdir() }),
+      (err: unknown) => {
+        assert.ok(err instanceof Error)
+        assert.match(err.message, /Failed to read viewer template: Permission denied/)
+        assert.strictEqual(err.cause, cause)
+        return true
+      }
+    )
+  })
+
   test('returns HTML string with injected BOM (no file written)', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aibom-'))
     const templatePath = path.join(tmpDir, 'viewer-template.html')
