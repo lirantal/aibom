@@ -28,7 +28,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "npm@8.4.0",
   "files": [
     "dist",
     "src",
@@ -36,14 +35,13 @@
   ],
   "scripts": {
     "start": "node --import tsx src/bin/cli.ts",
-    "build": "npm run build:template:root && tsc && tsup && npm run copy:template",
+    "build": "pnpm run build:template:root && tsc && tsup && pnpm run copy:template",
     "build:template:root": "pnpm --filter ai-bom-viewer build:template",
     "copy:template": "node scripts/copy-template.mjs",
-    "lint": "eslint . && npm run lint:lockfile && npm run lint:markdown",
-    "lint:markdown": "npx --no-install markdownlint-cli -c ../../.github/.markdownlint.yml -i '.git' -i '__tests__' -i '.github' -i '.changeset' -i 'CODE_OF_CONDUCT.md' -i 'CHANGELOG.md' -i 'node_modules' -i 'dist' -i 'docs/**' '**/**.md'",
-    "lint:markdown:fix": "npx --no-install markdownlint-cli -c ../../.github/.markdownlint.yml -i '.git' -i '__tests__' -i '.github' -i '.changeset' -i 'CODE_OF_CONDUCT.md' -i 'CHANGELOG.md' -i 'node_modules' -i 'dist' -i 'docs/**' '**/**.md' --fix",
+    "lint": "eslint . && pnpm run lint:markdown",
+    "lint:markdown": "pnpm exec markdownlint -c ../../.github/.markdownlint.yml -i '.git' -i '__tests__' -i '.github' -i '.changeset' -i 'CODE_OF_CONDUCT.md' -i 'CHANGELOG.md' -i 'node_modules' -i 'dist' -i 'docs/**' '**/**.md'",
+    "lint:markdown:fix": "pnpm exec markdownlint -c ../../.github/.markdownlint.yml -i '.git' -i '__tests__' -i '.github' -i '.changeset' -i 'CODE_OF_CONDUCT.md' -i 'CHANGELOG.md' -i 'node_modules' -i 'dist' -i 'docs/**' '**/**.md' --fix",
     "lint:fix": "eslint . --fix",
-    "lint:lockfile": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm yarn",
     "test": "c8 node --import tsx --test __tests__/**/*.test.ts",
     "test:watch": "c8 node --import tsx --test --watch __tests__/**/*.test.ts",
     "coverage:view": "open coverage/lcov-report/index.html",
@@ -79,23 +77,24 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.31.0",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.14.10",
     "c8": "^10.1.2",
     "eslint": "^10.2.1",
+    "eslint-plugin-n": "^18.4.0",
     "eslint-plugin-security": "^4.0.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
-    "lockfile-lint": "^4.14.0",
-    "markdownlint-cli": "0.45.0",
-    "neostandard": "^0.11.0",
+    "markdownlint-cli": "0.49.1",
     "tsup": "^8.1.0",
     "tsx": "^4.19.4",
-    "typescript": "^5.5.3",
-    "validate-conventional-commit": "^1.0.4"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
+    "validate-conventional-commit": "^2.0.0"
   },
   "lint-staged": {
     "**/*.{js,json}": [
-      "npm run lint:fix"
+      "pnpm run lint:fix"
     ]
   },
   "c8": {
