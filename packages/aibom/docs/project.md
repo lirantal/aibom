@@ -72,3 +72,14 @@ This runs, in order (see `package.json` scripts):
 4. **`copy:template`** — `node scripts/copy-template.mjs` to copy the webapp template into `dist/viewer-template.html`.
 
 The package **files** include `dist`, so the published tarball contains `dist/bin/cli.cjs`, `dist/viewer-template.html`, and the library builds.
+
+## Package-manager versions
+
+Use the exact pnpm version in the root `package.json` for local development, CI,
+and deployment. `pnpm/action-setup` reads this pin. For local setup, install that
+version with `npm install --global "$(node -p 'require("./package.json").packageManager')"`
+from the repository root, then run `pnpm install --frozen-lockfile`.
+The release workflow reads its auxiliary npm version from `.npm-version`.
+Upgrade these pins and their lockfile entries together in a maintenance PR,
+select releases at least 30 days old, and run lint, build, and tests with the new
+version. Keep the workspace security policies enabled.

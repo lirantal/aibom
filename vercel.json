@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter ai-bom-viewer build",
   "outputDirectory": "packages/webapp/dist",
   "framework": null

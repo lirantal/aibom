@@ -60,7 +60,7 @@ This format drives changelog generation and release automation, so it matters mo
 ## Local development
 
 1. Fork and clone the repository.
-2. Use Node.js 24 (the CI version) and pnpm 11 or newer. Install from the repository root with `pnpm install --frozen-lockfile`; `pnpm-lock.yaml` is the workspace lockfile.
+2. Use Node.js 24 (the CI version) and the exact pnpm version in `package.json#packageManager`. Install from the repository root with `pnpm install --frozen-lockfile`; `pnpm-lock.yaml` is the workspace lockfile.
 3. Build the CLI and viewer template with `pnpm --filter aibom run build`, then run `pnpm --filter aibom test` so the CLI end-to-end tests execute.
 4. Run `pnpm --filter aibom run lint`. The build also runs the TypeScript checker.
 5. Make your change on a feature branch, commit using the format above, and open a PR.
