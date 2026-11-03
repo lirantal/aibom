@@ -26,14 +26,14 @@ jobs:
         with:
           node-version: 24.x
           cache: 'pnpm'
-      - name: Update npm
-        run: npm update -g npm
+      - name: Set up pinned npm
+        run: npm install --global --min-release-age=30 "npm@$(cat .npm-version)"
       - name: install root dependencies
         run: pnpm install --frozen-lockfile
       - name: build root HTML template
         run: pnpm run build:template
       - name: build project
-        run: npm run build
+        run: pnpm run build
         working-directory: packages/aibom
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
