@@ -12,10 +12,8 @@
   <a href="https://www.npmjs.com/package/ai-bom-visualizer"><img src="https://badgen.net/npm/v/ai-bom-visualizer" alt="npm version"/></a>
   <a href="https://www.npmjs.com/package/ai-bom-visualizer"><img src="https://badgen.net/npm/license/ai-bom-visualizer" alt="license"/></a>
   <a href="https://www.npmjs.com/package/ai-bom-visualizer"><img src="https://badgen.net/npm/dt/ai-bom-visualizer" alt="downloads"/></a>
-  <a href="https://github.com/lirantal/ai-bom-visualizer/actions?workflow=CI"><img src="https://github.com/lirantal/ai-bom-visualizer/workflows/CI/badge.svg" alt="build"/></a>
-  <a href="https://app.codecov.io/gh/lirantal/ai-bom-visualizer"><img src="https://badgen.net/codecov/c/github/lirantal/ai-bom-visualizer" alt="codecov"/></a>
-  <a href="https://snyk.io/test/github/lirantal/ai-bom-visualizer"><img src="https://snyk.io/test/github/lirantal/ai-bom-visualizer/badge.svg" alt="Known Vulnerabilities"/></a>
-  <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Responsible Disclosure Policy" /></a>
+  <a href="https://github.com/lirantal/aibom/actions?workflow=CI"><img src="https://github.com/lirantal/aibom/workflows/CI/badge.svg" alt="build"/></a>
+  <a href="https://app.codecov.io/gh/lirantal/aibom"><img src="https://badgen.net/codecov/c/github/lirantal/aibom" alt="codecov"/></a>
 </p>
 
 ## Install
