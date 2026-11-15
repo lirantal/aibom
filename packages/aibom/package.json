@@ -78,7 +78,7 @@
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "c8": "^12.0.0",
     "eslint": "^10.12.0",
     "eslint-plugin-n": "^18.4.1",
@@ -89,7 +89,7 @@
     "tsup": "^8.1.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.1",
+    "typescript-eslint": "^8.71.2",
     "validate-conventional-commit": "^2.0.0"
   },
   "lint-staged": {
